@@ -43,7 +43,7 @@ yarn build
 
 ## Архитектура
 
-[src/images/](https://raw.githubusercontent.com/elizavetaa0/web-larek-frontend/main/src/images/)web-larek.drawio.png
+[src/images/](https://github.com/elizavetaa0/web-larek-frontend/main/src/images/)web-larek.drawio.png
 
 ## Базовый код
 
