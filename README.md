@@ -43,7 +43,7 @@ yarn build
 
 ## Архитектура
 
-src/images/web-larek.drawio.png
+![Схема UML](https://github.com/elizavetaa0/web-larek-frontend/blob/main/src/images/web-larek.drawio.png)
 
 ## Базовый код
 
