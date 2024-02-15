@@ -41,211 +41,782 @@ npm run build
 yarn build
 ```
 
-## Архитектура
-
-![Схема UML](https://github.com/elizavetaa0/web-larek-frontend/blob/main/src/images/web-larek.drawio.png)
-
 ## Описание проекта
 
-При разработке проекта использовался паттерн MVP. Проект состоит из трех основных частей - Model, View, Presenter.
+При разработке проекта использовался паттерн **MVP**.
 
-Model - отвечает за обработку данных и бизнес-логику, к ее функциям относятся методы по получению, обновлению и удалению данных.
+**Model** - отвечает за обработку данных и бизнес-логику, к ее функциям относятся методы по получению, обновлению и удалению данных.
 
-View - отвечает за отображение данных или элементов интерефейса. К функциям можно отнести - отображение полученных с сервера данных, нажатие на кнопку или обработка нажатий кнопок, ввод текста, а также отправка запросов на сервер, валидация форм ввода.
+**View** - отвечает за отображение данных или элементов интерефейса. К функциям можно отнести - отображение полученных с сервера данных, нажатие на кнопку или обработка нажатий кнопок, ввод текста, а также отправка запросов на сервер, валидация форм ввода.
 
-Presenter - посредник между моделью и представлением. Он отвечает за обработку событий. В проекте представлен классом EventEmmitter.
+**Presenter** - посредник между моделью и представлением. Он отвечает за обработку событий. В проекте представлен классом EventEmmitter.
 
 Взаимодействие между частями архитектуры происходит следующим образом:
 
-Представление отправляет запросы на получение данных или выполнение операций пользователю через презентера.  
-Презентер обрабатывает запросы, взаимодействует с моделью для получения или обновления данных и передает их обратно представлению для отображения.  
-При изменении данных в модели, презентер уведомляет представление об этом, чтобы оно могло обновить свое состояние.
+1. Представление отправляет запросы на получение данных или выполнение операций пользователю через презентера.  
+2. Презентер обрабатывает запросы, взаимодействует с моделью для получения или обновления данных и передает их обратно представлению для отображения.  
+3. При изменении данных в модели, презентер уведомляет представление об этом, чтобы оно могло обновить свое состояние.
 
-Процессы в приложении реализованы с помощью событийно-ориентированного подхода, т.к вводится посредник - презентер для подписки на соверщаемые события и оповещения всех подписчиков об изменениях.
+Процессы в приложении реализованы с помощью **событийно-ориентированного подхода**, т.к вводится посредник - презентер для подписки на соверщаемые события и оповещения всех подписчиков об изменениях.
 
-## Описание данных
+## Типы и интерфейсы
 
-## ICatalogue и ICatalogueProduct
+### ICatalogue
 
-Назначение: Интерфейс ICatalogue предназначен для представления каталога товаров, полученного от сервера. Он содержит информацию об общем количестве товаров в каталоге и массив объектов ICatalogueProduct, представляющих собой конкретные товары.
+Интерфейс описывает каталог с массивом объектов - товаров, которые получаем от сервера.
 
-Хранение данных: Используется для хранения данных о каталоге товаров, предоставляя удобный доступ к информации о каждом товаре.
+```
+interface ICatalogue {
+  total: number;
+  items: ICatalogueProduct;
+}
+```
 
-Использование: Используется на главной странице приложения для отображения списка товаров.
+### ICatalogueProduct
 
-## IPayment
+Описывает конкретный товар из массива. св-во description опционально, т.к появляется только при открытии подробной информации (модального окна).
 
-Назначение: Интерфейс IPayment описывает структуру данных для представления способа оплаты и адреса доставки.
+```
+interface ICatalogueProduct {
+  id: string;
+  description?: string;
+  image: string;
+  title: string;
+  category: string;
+  price: number | null;
+}
+```
 
-Хранение данных: Используется для хранения информации, введенной пользователем при выборе способа оплаты и вводе адреса доставки.
+### IPayment
 
-Использование: Применяется при оформлении заказа, где покупатель выбирает способ оплаты и вводит адрес доставки.
+Описывает способ оплаты и позволяет ввести адрес доставки заказа.
 
-## IOrderForm и IOrder
+```
+interface IPayment {
+  paymentMethod: string;
+  deliveryAddress: string;
+}
+```
 
-Назначение: Интерфейс IOrderForm предназначен для описания формы заказа, с возможностью ввода электронной почты и номера телефона заказчика. Интерфейс IOrder расширяет IOrderForm, добавляя к нему массив идентификаторов заказанных товаров.
+### IOrderForm
 
-Хранение данных: IOrderForm используется для временного хранения данных формы заказа перед отправкой на сервер. IOrder используется для представления заказа с полной информацией, готового для отправки на сервер.
+Описывает форму заказа с вводом данных о заказчике - почта и телефон.
 
-Использование: Применяется на этапе формирования заказа, когда покупатель вводит свои контактные данные.
+```
+interface IOrderForm {
+  email: string;
+  phone: string;
+}
+```
 
-## FormErrors
+### IOrder
 
-Назначение: Тип FormErrors предназначен для описания ошибок валидации формы ввода.
+Интерфейс описывает заказ, добавляя к информации о заказчике массив идентификаторов заказа.
 
-Хранение данных: Используется для хранения сообщений об ошибках валидации для каждого поля формы.
+```
+interface IOrder extends IOrderForm {
+  items: string[];
+}
+```
 
-Использование: Применяется в процессе валидации данных формы, чтобы сообщить пользователю об ошибках ввода.
+### FormErrors
 
-## IOrderResult
+Данный тип позволяет описать ошибки формы ввода.
 
-Назначение: Интерфейс IOrderResult описывает структуру данных, представляющую результат успешного оформления заказа с уникальным идентификатором и общей суммой покупки.
+```
+type FormErrors = Partial<Record<keyof IOrderForm, string>>;
+```
 
-Хранение данных: Используется для хранения информации о успешно оформленном заказе.
+### IOrderResult
 
-Использование: Применяется для предоставления клиенту информации о результате успешного оформления заказа.
+Описывает результат заказа с уникальным идентификатором и суммой.
 
-## Базовый код
+```
+interface IOrderResult {
+  id: string;
+  total: number;
+}
+```
 
-### Класс EventEmitter
+### ICartItem
+
+Тип для описания элемента корзины, содержащий информацию о товаре - id, title, price, а также отображающий общую сумму покупки.
+
+```
+type ICartItem = Pick<ICatalogueProduct, 'id' | 'title' | 'price'> & {
+  total: number;
+};
+```
+
+### IAppState
+
+Интерфейс для описания состояния приложения.
+```
+interface IAppState {
+  catalogue: ICatalogueProduct[];
+  cart: string[];
+  preview: string | null;
+  order: IOrder | null;
+  loading: boolean;
+}
+```
+
+## Базовые классы
+
+### class EventEmitter implements IEvents
 
 Представляет собой паттерн "Наблюдатель". Данный класс позволяет подписываться на события и сообщать подписчикам о наступлении события.
 
-Класс имеет методы on, off, emit, reset, bindElement.
+**Свойства:**
 
-Метод on используется для подписки на событие. Метод off - для отписки от события, а метод emit - для уведомления о наступлении события.
+```
+_events: Map<EventName, Set<Subscriber>>
 
-Метод reset применяется для сброса состояния эмиттера, и метод bindElement применяется для привязки к другому эмиттеру.
+constructor() {
+  this._events = new Map<EventName, Set<Subscriber>>();
+}
+```
 
-### Класс HTMLCustomItem
+**Методы:**
+- устанавливает обработчик на событие.
+```
+on<T extends object>(eventName: EventName, callback: (event: T) => void)
+```
+- снимает обработчик события.
+```
+off(eventName: EventName, callback: Subscriber) 
+```
+- инициироует событие с данными.
+```
+emit<T extends object>(eventName: string, data?: T) 
+```
+- слушает все события.
+```
+onAll(callback: (event: EmitterEvent) => void)
+```
+- сбрасывает все события.
+```
+offAll()
+```
+- делает коллбэк триггер, генерирующий все события.
+```
+trigger<T extends object>(eventName: string, context?: Partial<T>) 
+```
 
-Представляет собой низкоуровневое API для работы с HTML элементами. 
+### abstract class Component
 
-В данном классе переопределяются методы из класса EventEmitter - on, off, emit, reset, bindElement. Это необходимо для ограничения событий, с которыми может работать конкретный элемент.
+Представляет собой низкоуровневое API для работы с HTML элементами.
 
-Также в класс добавляются другие методы необходимые для работы с элементами. К таким методам относят, например, методы setText - устанавливает текст, setLink - устанавливает ссылку, setValue - устанавливает значение. Также используются методы по работе с классами элемента - добавление, удаление и переключение. 
+**Свойства:**
+```
+protected constructor(protected readonly container: HTMLElement) {}
+```
+**Методы:**
+- переключает класс.
+```
+toggleClass(element: HTMLElement, className: string, force?: boolean) 
+```
+- устанавливает текстовое содержимое.
+```
+protected setText(element: HTMLTextAreaElement, value: unknown) 
+```
+- изменяет статус блокировки.
+```
+setDisabled(element: HTMLButtonElement, state: boolean)
+```
+- скрывает элемент.
+```
+protected setHidden(element: HTMLElement)
+```
+- делает элемент видимым.
+```
+protected setVisible(element: HTMLElement) 
+```
+- устанавливает изображение.
+```
+protected setImage(element: HTMLImageElement, src: string, alt?: string) 
+```
+- возвращает корневой DOM-элемент.
+```
+render(data?: Partial<T>): HTMLElement 
+```
 
-В классе присутствует метод render, который используется для отрисовки элемента. Также используются методы для отображения элемента - hide/show/remove.
-
-Помимо описанных методов, в классе присутствует метод проверки валидности элемента - isValid, geyValidationMessage.
-
-### Класс View
-
-От данного класса наследуются компоненты, в нем прописывается полная типизация данных.
-
-Метод select используется для выбора любого произвольного DOM элемента. 
-
-Метод assign позволяет устанавливать данные в любой компонент. Метод copy позволяет скопировать любой элемент.
-
-Метод bem используется для получения элемента и модификатора, чтобы вернуть нам итоговое имя класса для работы с элементами по БЭМ.
-Метод toggle позволяет переключать модификаторы, не зная имя блока. Метод setVisibleContent позволяет  установить видимость контента.
-
-И также в данном классе присутствуют методя для инициализации компонентов -  factory, clone, mount.
-
-### Класс API
+### class Api
 
 Данный класс используется для получения и отправки данных на сервер.
 
-В классе используются стандартные методы для получения данных - get, для отправки данных - post.
+**Свойства:**
+```
+readonly baseUrl: string;
+protected options: RequestInit;
+
+constructor(baseUrl: string, options: RequestInit = {}) {
+  this.baseUrl = baseUrl;
+  this.options = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers as object ?? {})
+      }
+  };
+}
+```
+**Методы:**
+- используется для обработки ответа от сервера после выполнения HTTP-запроса.
+```
+protected handleResponse(response: Response): Promise<object> 
+```
+- используется для получения данных от сервера.
+```
+get(uri: string) 
+```
+- используется для отправки данных на сервер.
+```
+post(uri: string, data: object, method: ApiPostMethods = 'POST')
+```
 
 ## Компоненты модели данных (бизнес-логика)
 
-### Класс CatalogueData
+### class LarekApi
+Предоставляет методы для взаимодействия с внешним API.
 
-Назначение: Хранение информации о каталоге товаров и его состоянии.
+**Свойства:**
+```
+readonly cdn: string;
 
-Свойства:
-items: ICatalogueProduct[] - массив объектов, представляющих товары в каталоге.
-total: number - общее количество товаров в каталоге.
-selectedItem: ICatalogueProduct | null - текущий выбранный товар для отображения подробной информации.
+constructor(cdn: string, baseUrl: string, options?: RequestInit) {
+  super(baseUrl, options);
+  this.cdn = cdn;
+}
+```
+**Методы:**
+- получает информацию о товаре по id.
+```
+getItem(id: string): Promise<ICatalogueProduct>;
+```
+- получает список всех товаров.
+```
+getItemsList(): Promise<ICatalogueProduct[]>;
+```
+- отправка заказа на сервер.
+```
+orderItems(order: IOrder): Promise<IOrderResult>;
+```
 
-Методы:
-getCatalogueItems(): ICatalogueProduct[] - возвращает массив товаров из каталога.
-getTotalItemsCount(): number - возвращает общее количество товаров в каталоге.
-selectItem(itemId: string): void - выбирает товар для отображения подробной информации.
+### class CatalogueData
 
-### Класс CartData 
+Хранит информацию о каталоге товаров и его состоянии.
 
-Назначение: Хранение информации о корзине пользователя и управление товарами в корзине.
+**Свойства:**
+```
+items: ICatalogueProduct[];
+total: number;
+selectedItem: ICatalogueProduct | null;
 
-Свойства:
-items: ICartItem[] - массив объектов, представляющих товары в корзине.
-totalPrice: number - общая стоимость товаров в корзине.
+constructor(data: { items: ICatalogueProduct[]; total: number; selectedItem: ICatalogueProduct | null; }, protected events: IEvents) {
+  this.items = data.items;
+  this.total = data.total;
+  this.selectedItem = data.selectedItem;
+}
+```
+**Методы:**
+- отправка событий.
+```
+emitChanges(event: string, payload?: object): void;
+```
+- возвращает массив товаров из каталога.
+```
+getCatalogueItems(): ICatalogueProduct[];
+```
+- возвращает общее количество товаров в каталоге.
+```
+getTotalItemsCount(): number;
+```
+- выбирает товар для отображения подробной информации.
+```
+selectItem(itemId: string): void;
+```
 
-Методы:
-getCartItems(): ICartItem[] - возвращает массив товаров из корзины.
-getTotalPrice(): number - возвращает общую стоимость товаров в корзине.
-addItemToCart(item: ICatalogueProduct): void - добавляет товар в корзину.
-removeItemFromCart(itemId: string): void - удаляет товар из корзины.
+### class CartData 
 
-### Класс OrderData
+Хранить информацию о корзине пользователя и управляет товарами в корзине.
 
-Назначение: Хранение информации о заказе пользователя и управление процессом оформления заказа.
+**Свойства:**
+```
+items: ICartItem[];
+totalPrice: number;
 
-Свойства:
-orderForm: IOrderForm - объект, представляющий данные заказчика (электронная почта, телефон).
-selectedItems: string[] - массив идентификаторов выбранных товаров для заказа.
-paymentDetails: IPayment | null - объект, представляющий данные о способе оплаты и адресе доставки.
+constructor(data: { items: ICartItem[]; totalPrice: number; }, protected events: IEvents) {
+  this.items = data.items;
+  this.totalPrice = data.totalPrice;
+}
+```
+**Методы:**
+- отправка событий.
+```
+emitChanges(event: string, payload?: object): void;
+```
+- возвращает массив объектов, представляющих товары в корзине пользователя.
+```
+getCartItems(): ICartItem[];
+```
+- общую стоимость всех товаров в корзине пользователя. 
+```
+getTotalPrice(): number;
+```
+- добавляет товар в корзину.
+```
+addItemToCart(item: ICatalogueProduct): void;
+```
+- удаляет товар из корзины.
+```
+removeItemFromCart(itemId: string): void;
+```
 
-Методы:
-getOrderForm(): IOrderForm - возвращает данные заказчика.
-getSelectedItems(): string[] - возвращает массив идентификаторов выбранных товаров.
-setOrderForm(formData: IOrderForm): void - устанавливает данные заказчика.
-selectItems(items: string[]): void - выбирает товары для заказа.
-setPaymentDetails(paymentInfo: IPayment): void - устанавливает данные о способе оплаты и адресе доставки.
+### class OrderData
 
-## Компоненты представления
+Хранит информацию о заказе пользователя и управляет процессом оформления заказа.
 
-### Класс Catalogue
+**Свойства:**
+```
+orderForm: IOrderForm;
+selectedItems: string[];
+paymentDetails: IPayment | null;
 
-Назначение: Отображение каталога товаров.
+constructor(data: { orderForm: IOrderForm; selectedItems: string[]; paymentDetails: IPayment | null; }, protected events: IEvents) {
+  this.orderForm = data.orderForm;
+  this.selectedItems = data.selectedItems;
+  this.paymentDetails = data.paymentDetails;
+}
+```
+**Методы:**
+- отправка событий.
+```
+emitChanges(event: string, payload?: object): void;
+```
+- возвращает данные заказчика.
+```
+getOrderForm(): IOrderForm;
+```
+- возвращает массив идентификаторов выбранных товаров.
+```
+getSelectedItems(): string[];
+```
+- устанавливает данные заказчика.
+```
+setOrderForm(formData: IOrderForm): void;
+```
+- выбирает товары для заказа.
+```
+selectItems(items: string[]): void;
+```
+- устанавливает данные о способе оплаты и адресе доставки.
+```
+setPaymentDetails(paymentInfo: IPayment): void;
+```
 
-Свойства:
-catalogueData: ICatalogue - данные о продуктах.
-onProductClick: (productId: string) => void - обработчик клика по продукту.
+## Компоненты представления 
 
-Методы:
-render(): void - отображение каталога.
+### class Page
 
-### Класс ProductDetails
+Управляет отображением элементов интерфейса на странице.
 
-Назначение: Отображение подробной информации о продукте.
-
-Свойства:
-productData: ICatalogueProduct - данные о продукте.
-
-Методы:
-render(): void - отображение подробной информации о продукте.
-onAddToCartClick: () => void - обработчик добавления товара в корзину.
-
-### Класс Cart
-
-Назначение: Отображение содержимого корзины.
-
-Свойства:
-cartItems: ICartItem[] - данные о товарах в корзине.
-onCheckoutClick: () => void - обработчик оформления заказа.
-
-Методы:
-render(): void - отображение содержимого корзины.
-
-### Класс OrderForm
-
-Назначение: Форма ввода данных для оформления заказа.
-
-Свойства:
-onSubmit: (orderFormData: IOrderForm) => void - обработчик отправки формы.
-
-Методы:
-render(): void - отображение формы ввода данных.
-
-### Класс Modal
-
-Общий класс для модальных окон. Включает в себя методы для открытия show() и закрытия модального окна close().
-
-### Класс Button
-
-Класс Button представляет собой общую кнопку с атрибутом для текста и методом click().
+**Свойства:**
+```
+protected _counter: HTMLTextAreaElement;
+  protected _catalog: HTMLElement;
+  protected _wrapper: HTMLElement;
+  protected _basket: HTMLElement;
 
 
+  constructor(container: HTMLElement, protected events: IEvents) {
+      super(container);
 
+      this._counter = ensureElement<HTMLTextAreaElement>('.header__basket-counter');
+      this._catalog = ensureElement<HTMLElement>('.gallery');
+      this._wrapper = ensureElement<HTMLElement>('.page__wrapper');
+      this._basket = ensureElement<HTMLElement>('.header__basket');
+
+      this._basket.addEventListener('click', () => {
+          this.events.emit('basket:open');
+      });
+  }
+```
+
+**Методы:**
+- установка значения счетчика.
+```
+set counter(value: number);
+```
+- установка содержимого каталога продуктов.
+```
+set catalog(items: HTMLElement[]);
+```
+- установка блокировки страницы.
+```
+set locked(value: boolean);
+```
+
+### class Catalogue
+
+Отображает каталог товаров.
+
+**Свойства:**
+```
+catalogueData: ICatalogueProduct[];
+onProductClick: (productId: string) => void;
+
+constructor(catalogueData: ICatalogueProduct[], onProductClick: (productId: string) => void) {
+  this.catalogueData = catalogueData;
+  this.onProductClick = onProductClick;
+}
+```
+**Методы:**
+- отображение каталога.
+```
+render(): void;
+```
+- добавление товара в контейнер каталога.
+```
+catalogueContainer.appendChild(productElement);
+```
+### class Card
+
+Отображает информацию о карточке товара.
+
+**Свойства:**
+```
+protected _title: HTMLTextAreaElement;
+protected _image: HTMLImageElement;
+protected _category: HTMLElement;
+protected _price: HTMLElement;
+protected _actions: ICardActions | undefined;
+
+constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) {
+  super(container);
+
+  this._title = ensureElement<HTMLTextAreaElement>(`.${blockName}__title`, container);
+  this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
+  this._category = ensureElement<HTMLElement>(`.${blockName}__category`, container);
+  this._price = ensureElement<HTMLElement>(`.${blockName}__price`, container);
+  this._actions = actions;
+
+  container.addEventListener('click', this.handleClick.bind(this));
+}
+```
+**Методы:**
+- обработка клика по карточке товара.
+```
+private handleClick(event: MouseEvent);
+```
+- сеттер установки id элемента DOM.
+```
+set id(value: string);
+```
+- геттер для получения id.
+```
+get id(): string;
+```
+- установка заголовка карточки.
+```
+set title(value: string);
+```
+- получение заголовка карточки.
+```
+get title(): string;
+```
+- установка изображения карточки.
+```
+set image(value: string);
+```
+- установка цены товара.
+```
+set price(value: number | null);
+```
+- установка категории товара.
+```
+set category(value: string);
+```
+
+### class Cart 
+
+Отображает содержимое корзины.
+
+**Свойства:**
+```
+protected _list: HTMLElement;
+protected _total: HTMLSpanElement;
+protected _button: HTMLButtonElement;
+private _cartItems: ICartItem[] = [];
+
+constructor(container: HTMLElement, protected events: EventEmitter) {
+  super(container);
+
+  this._list = ensureElement<HTMLElement>('.basket__list', this.container);
+  this._total = this.container.querySelector('.basket__price') as HTMLSpanElement;
+  this._button = this.container.querySelector('.basket__button');
+
+  if (this._button) {
+    this._button.addEventListener('click', () => {
+      events.emit('order:open');
+    });
+  }
+
+  this.items = [];
+  this.renderCart();
+  }
+```
+**Методы:**
+- очищает содержимое корзины.
+```
+clearBasket();
+```
+- возвращает текущий список элементов корзины.
+```
+getCartItems()
+```
+- устанавливает отображаемые элементы корзины
+```
+set items(items: HTMLElement[]);
+```
+- устанавливает общую сумму заказа в корзине.
+```
+set total(total: number);
+```
+- проверяет, содержится ли элемент с заданным itemId в корзине.
+```
+isItemInCart(itemId: string): boolean;
+```
+- добавляет элемент в корзину.
+```
+addItem(item: ICartItem);
+```
+- удаляет элемент из корзины.
+```
+removeItem(itemId: string);
+```
+- отображает содержимое корзины на веб-странице.
+```
+renderCart();
+```
+
+### class OrderForm 
+
+Форма ввода данных для оформления заказа. 
+
+**Свойства:**
+```
+  button: HTMLButtonElement;
+    address: string = ''; 
+    selectedPaymentMethod: string = ''; 
+    email: string = ''; 
+    phone: string = ''; 
+
+    constructor(container: HTMLFormElement, events: IEvents) {
+        super(container, events);
+        this.button = container.querySelector('.order__button');
+    
+        const inputs = container.querySelectorAll<HTMLInputElement>('input[name="address"]');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                this.address = input.value;
+                this.updateSubmitButtonState();
+            });
+        });
+    
+        const paymentButtons = container.querySelectorAll<HTMLButtonElement>('.order__buttons button');
+        paymentButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const selectedMethod = button.name;
+                this.selectedPaymentMethod = selectedMethod;
+                this.updateSubmitButtonState();
+                this.togglePaymentButtonStyles(selectedMethod); 
+            });
+        });
+    }
+```
+**Методы:**
+- применяет стили к кнопкам выбора метода оплаты.
+```
+togglePaymentButtonStyles(paymentMethod: string);
+```
+- геттер, возвращающий объект с данными формы заказа.
+```
+get formData();
+```
+- обновляет состояние кнопки отправки заказа.
+```
+updateSubmitButtonState();
+```
+- устанавливает состояние кнопки отправки заказа.
+```
+setButtonState(isValid: boolean);
+```
+
+### class Modal
+
+Общий класс для модальных окон.
+
+**Свойства:**
+```
+protected _closeButton: HTMLButtonElement;
+protected _content: HTMLElement;
+
+constructor(container: HTMLElement, protected events: IEvents) {
+ super(container);
+
+  this._closeButton = ensureElement<HTMLButtonElement>('.modal__close', container);
+  this._content = ensureElement<HTMLElement>('.modal__content', container);
+
+  this._closeButton.addEventListener('click', this.close.bind(this));
+  this.container.addEventListener('click', this.close.bind(this));
+  this._content.addEventListener('click', (event) => event.stopPropagation());
+}
+```
+**Методы:**
+- сеттер для установки нового значения в свойство content.
+```
+set content(value: HTMLElement);
+```
+- открывает модальное окно.
+```
+open();
+```
+- закрывает модальное окно.
+```
+close();
+```
+- отрисовывает модальное окно.
+```
+render(data: IModalData): HTMLElement;
+```
+
+### class Success
+
+Отображает сообщение об успешном заказе и предоставляет возможность его закрыть.
+
+**Свойства:**
+```
+protected _close: HTMLElement;
+
+constructor(container: HTMLElement, actions: ISuccessActions) {
+  super(container);
+
+  this._close = ensureElement<HTMLElement>('.order-success__close', this.container);
+
+  if (actions?.onClick) {
+    this._close.addEventListener('click', actions.onClick);
+    }
+  }
+```
+
+### class Form
+
+Отображает формы на странице и управляет отображением состояния форм.
+
+**Свойства:**
+```
+protected _submit: HTMLButtonElement;
+
+  constructor(protected container: HTMLFormElement, protected events: IEvents) {
+    super(container);
+
+    this._submit = ensureElement<HTMLButtonElement>('button[type=submit]', this.container);
+
+    this.container.addEventListener('input', (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const field = target.name as keyof T;
+      const value = target.value;
+      this.onInputChange(field, value);
+    });
+
+    this.container.addEventListener('submit', (e: Event) => {
+      e.preventDefault();
+      this.events.emit(`${this.container.name}:submit`);
+      });
+    }
+```
+
+**Методы:**
+- обновление состояния формы и отправки соответствующего события.
+```
+protected onInputChange(field: keyof T, value: string);
+```
+- устанавливает состояние валидности формы.
+```
+set valid(value: boolean);
+```
+- отрисовка состояния формы.
+```
+render(state: Partial<T> & IFormState);
+```
+- получает контейнер.
+```
+getFormContainer(): HTMLFormElement;
+```
+
+### class AppState
+Отвечает за управление и обработку данных в приложении.
+
+**Свойства:**
+```
+  basket: string[];
+  catalog: ProductItem[];
+  loading: boolean;
+  order: IOrder = {
+      email: '',
+      phone: '',
+      items: [],
+      payment: ''
+  };
+
+  preview: string | null;
+  formErrors: FormErrors = {};
+```
+**Методы:**
+- переключает состояние товара в заказе.
+```
+toggleOrderedItem(id: string, isIncluded: boolean);
+```
+- очищает корзину заказа, удаляя все товары из нее.
+```
+clearBasket();
+```
+- вычисляет общую стоимость товаров в заказе.
+```
+getTotal();
+```
+- устанавливает каталог товаров.
+```
+setCatalog(items: ICatalogueProduct[]);
+```
+- устанавливает предварительный просмотр.
+```
+setPreview(item: ProductItem);
+```
+
+
+## Основные события
+
+1. **basket:open**:
+   - Описание: Событие, которое сигнализирует о запросе открытия корзины.
+
+2. **card:select**:
+   - Описание: Событие, которое срабатывает при выборе карточки товара.
+
+3. **order:open**:
+   - Описание: Событие, вызываемое при открытии формы заказа.
+
+4. **contacts:open**:
+   - Описание: Событие, сигнализирующее о запросе открытия формы контактов для заказа.
+
+5. **success:open**:
+   - Описание: Событие, которое срабатывает при успешном оформлении заказа.
+
+6. **order:submit**:
+   - Описание: Событие, вызываемое при подтверждении оформления заказа.
+
+7. **modal:open**:
+   - Описание: Событие, срабатывающее при открытии модального окна.
+
+8. **modal:close**:
+   - Описание: Событие, вызываемое при закрытии модального окна.
