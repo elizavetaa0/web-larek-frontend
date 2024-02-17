@@ -1,46 +1,50 @@
-import { ICatalogueProduct } from "../types";
+import { ICatalogueProduct } from '../types';
 
 export class Catalogue {
-  catalogueData: ICatalogueProduct[];
-  onProductClick: (productId: string) => void;
+	catalogueData: ICatalogueProduct[];
+	onProductClick: (productId: string) => void;
 
-  constructor(catalogueData: ICatalogueProduct[], onProductClick: (productId: string) => void) {
-    this.catalogueData = catalogueData;
-    this.onProductClick = onProductClick;
-  }
+	constructor(
+		catalogueData: ICatalogueProduct[],
+		onProductClick: (productId: string) => void
+	) {
+		this.catalogueData = catalogueData;
+		this.onProductClick = onProductClick;
+	}
 
-  render(): void {
-    const catalogueContainer = document.getElementById('catalogue-container');
+	render(): void {
+		const catalogueContainer = document.getElementById('catalogue-container');
 
-    if (!catalogueContainer) {
-      console.error('Контейнер для каталога не найден');
-      return;
-    }
+		if (!catalogueContainer) {
+			console.error('Контейнер для каталога не найден');
+			return;
+		}
 
-    catalogueContainer.innerHTML = '';
+		catalogueContainer.innerHTML = '';
 
-    this.catalogueData.forEach(product => {
-      const template = document.getElementById('card-catalog') as HTMLTemplateElement;
-      const productElement = template.content.cloneNode(true) as HTMLElement;
+		this.catalogueData.forEach((product) => {
+			const template = document.getElementById(
+				'card-catalog'
+			) as HTMLTemplateElement;
+			const productElement = template.content.cloneNode(true) as HTMLElement;
 
-      const categoryElement = productElement.querySelector('.card__category');
-      if (categoryElement) categoryElement.textContent = product.category;
+			const categoryElement = productElement.querySelector('.card__category');
+			if (categoryElement) categoryElement.textContent = product.category;
 
-      const titleElement = productElement.querySelector('.card__title');
-      if (titleElement) titleElement.textContent = product.title;
+			const titleElement = productElement.querySelector('.card__title');
+			if (titleElement) titleElement.textContent = product.title;
 
-      const imageElement = productElement.querySelector('.card__image');
-      if (imageElement) imageElement.setAttribute('src', product.image);
+			const imageElement = productElement.querySelector('.card__image');
+			if (imageElement) imageElement.setAttribute('src', product.image);
 
-      const priceElement = productElement.querySelector('.card__price');
-      if (priceElement) priceElement.textContent = `${product.price} синапсов`;
+			const priceElement = productElement.querySelector('.card__price');
+			if (priceElement) priceElement.textContent = `${product.price} синапсов`;
 
-      productElement.addEventListener('click', () => {
-        this.onProductClick(product.id);
-      });
+			productElement.addEventListener('click', () => {
+				this.onProductClick(product.id);
+			});
 
-      catalogueContainer.appendChild(productElement);
-    });
-  }
+			catalogueContainer.appendChild(productElement);
+		});
+	}
 }
-

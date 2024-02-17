@@ -1,64 +1,70 @@
-import { Form } from "./base/Form";
-import { IOrderForm } from "../types";
-import { IEvents } from "./base/events";
+import { Form } from './base/Form';
+import { IOrderForm } from '../types';
+import { IEvents } from './base/events';
 
 export class OrderForm extends Form<IOrderForm> {
-    button: HTMLButtonElement;
-    address: string = ''; 
-    selectedPaymentMethod: string = ''; 
-    email: string = ''; 
-    phone: string = ''; 
+	button: HTMLButtonElement;
+	address: string = '';
+	selectedPaymentMethod: string = '';
+	email: string = '';
+	phone: string = '';
 
-    constructor(container: HTMLFormElement, events: IEvents) {
-        super(container, events);
-        this.button = container.querySelector('.order__button');
-    
-        const inputs = container.querySelectorAll<HTMLInputElement>('input[name="address"]');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                this.address = input.value;
-                this.updateSubmitButtonState();
-            });
-        });
-    
-        const paymentButtons = container.querySelectorAll<HTMLButtonElement>('.order__buttons button');
-        paymentButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const selectedMethod = button.name;
-                this.selectedPaymentMethod = selectedMethod;
-                this.updateSubmitButtonState();
-                this.togglePaymentButtonStyles(selectedMethod); 
-            });
-        });
-    }
+	constructor(container: HTMLFormElement, events: IEvents) {
+		super(container, events);
+		this.button = container.querySelector('.order__button');
 
-    togglePaymentButtonStyles(paymentMethod: string) {
-        const paymentButtons = this.container.querySelectorAll<HTMLButtonElement>('.order__buttons button');
-        paymentButtons.forEach(button => {
-            if (button.name === paymentMethod) {
-                button.classList.add('button_alt-active');
-            } else {
-                button.classList.remove('button_alt-active');
-            }
-        });
-    }
+		const inputs = container.querySelectorAll<HTMLInputElement>(
+			'input[name="address"]'
+		);
+		inputs.forEach((input) => {
+			input.addEventListener('input', () => {
+				this.address = input.value;
+				this.updateSubmitButtonState();
+			});
+		});
 
-    get formData() {
-        return {
-            paymentMethod: this.selectedPaymentMethod,
-            deliveryAddress: this.address,
-            email: this.email,
-            phone: this.phone
-        };
-    }
+		const paymentButtons = container.querySelectorAll<HTMLButtonElement>(
+			'.order__buttons button'
+		);
+		paymentButtons.forEach((button) => {
+			button.addEventListener('click', (event) => {
+				const selectedMethod = button.name;
+				this.selectedPaymentMethod = selectedMethod;
+				this.updateSubmitButtonState();
+				this.togglePaymentButtonStyles(selectedMethod);
+			});
+		});
+	}
 
-    updateSubmitButtonState() {
-        const isAddressFilled = this.address.trim() !== '';
-        const isPaymentSelected = !!this.selectedPaymentMethod;
-        this.setButtonState(isAddressFilled && isPaymentSelected);
-    }
+	togglePaymentButtonStyles(paymentMethod: string) {
+		const paymentButtons = this.container.querySelectorAll<HTMLButtonElement>(
+			'.order__buttons button'
+		);
+		paymentButtons.forEach((button) => {
+			if (button.name === paymentMethod) {
+				button.classList.add('button_alt-active');
+			} else {
+				button.classList.remove('button_alt-active');
+			}
+		});
+	}
 
-    setButtonState(isValid: boolean) {
-        this.button.disabled = !isValid;
-    }
+	get formData() {
+		return {
+			paymentMethod: this.selectedPaymentMethod,
+			deliveryAddress: this.address,
+			email: this.email,
+			phone: this.phone,
+		};
+	}
+
+	updateSubmitButtonState() {
+		const isAddressValid = this.address.trim() !== '';
+		const isPaymentSelected = this.selectedPaymentMethod !== '';
+		this.setButtonState(isAddressValid && isPaymentSelected);
+	}
+
+	setButtonState(isValid: boolean) {
+		this.button.disabled = !isValid;
+	}
 }

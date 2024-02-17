@@ -61,17 +61,6 @@ yarn build
 
 ## Типы и интерфейсы
 
-### ICatalogue
-
-Интерфейс описывает каталог с массивом объектов - товаров, которые получаем от сервера.
-
-```
-interface ICatalogue {
-  total: number;
-  items: ICatalogueProduct;
-}
-```
-
 ### ICatalogueProduct
 
 Описывает конкретный товар из массива. св-во description опционально, т.к появляется только при открытии подробной информации (модального окна).
@@ -300,40 +289,6 @@ getItemsList(): Promise<ICatalogueProduct[]>;
 - отправка заказа на сервер.
 ```
 orderItems(order: IOrder): Promise<IOrderResult>;
-```
-
-### class CatalogueData
-
-Хранит информацию о каталоге товаров и его состоянии.
-
-**Свойства:**
-```
-items: ICatalogueProduct[];
-total: number;
-selectedItem: ICatalogueProduct | null;
-
-constructor(data: { items: ICatalogueProduct[]; total: number; selectedItem: ICatalogueProduct | null; }, protected events: IEvents) {
-  this.items = data.items;
-  this.total = data.total;
-  this.selectedItem = data.selectedItem;
-}
-```
-**Методы:**
-- отправка событий.
-```
-emitChanges(event: string, payload?: object): void;
-```
-- возвращает массив товаров из каталога.
-```
-getCatalogueItems(): ICatalogueProduct[];
-```
-- возвращает общее количество товаров в каталоге.
-```
-getTotalItemsCount(): number;
-```
-- выбирает товар для отображения подробной информации.
-```
-selectItem(itemId: string): void;
 ```
 
 ### class CartData 
