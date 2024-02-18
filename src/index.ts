@@ -210,7 +210,8 @@ events.on('order:open', () => {
 		const addressValue = addressInput.value.trim();
 		const selectedPaymentMethod = appData.order.payment;
 
-		const addressRegex = /^\d{6},\s*[\p{L}\d\s.,-]+$/u;
+		const addressRegex = /^[a-zA-Zа-яА-Я0-9\s\d,-\/№]+$/u;
+
 		const isAddressValid = addressRegex.test(addressValue);
 		const isPaymentSelected = !!selectedPaymentMethod;
 
@@ -234,7 +235,8 @@ events.on('order:open', () => {
 			return;
 		}
 
-		const addressRegex = /^\d{6},\s*[\p{L}\d\s.,-]+$/u;
+		const addressRegex = /^[a-zA-Zа-яА-Я0-9\s\d,-\/№]+$/u;
+
 		if (!addressRegex.test(addressValue)) {
 			return;
 		}
@@ -295,7 +297,7 @@ function validateEmail(email: string): boolean {
 }
 
 function validatePhone(phone: string): boolean {
-	const phoneRegex = /^\+\d{1,2}\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/;
+	const phoneRegex = /^\+7\s?\(?\d{3}\)?\s?\d{3}[-\s]?\d{2}[-\s]?\d{2}$/;
 	return phoneRegex.test(phone);
 }
 
